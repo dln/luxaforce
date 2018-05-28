@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 
@@ -10,13 +11,10 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-func newLuxaforceClient(hostAndPort, caPath string) (api.LuxaforceClient, error) {
-	creds, err := credentials.NewClientTLSFromFile(caPath, "")
-	if err != nil {
-		return nil, fmt.Errorf("load cert: %v", err)
-	}
-
-	conn, err := grpc.Dial(hostAndPort, grpc.WithTransportCredentials(creds))
+func newLuxaforceClient(hostAndPort) (api.LuxaforceClient, error) {
+	conn, err := grpc.Dial(hostAndPort, grpc.WithTransportCredentials(
+		credentials.NewTLS(&tls.Config{InsecureSkipVerify: true}),
+	))
 	if err != nil {
 		return nil, fmt.Errorf("dail: %v", err)
 	}
@@ -24,7 +22,7 @@ func newLuxaforceClient(hostAndPort, caPath string) (api.LuxaforceClient, error)
 }
 
 // func main() {
-// 	client, err := newLuxaforceClient("127.0.0.1:5557", "./grpc.crt")
+// 	client, err := newLuxaforceClient("127.0.0.1:5557")
 // 	if err != nil {
 // 		log.Fatalf("failed creating luxaforce client: %v ", err)
 // 	}

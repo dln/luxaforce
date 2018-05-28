@@ -20,8 +20,8 @@ func main() {
 		log.Fatalf("failed to load key pair: %s", err)
 	}
 	grpcOptions := []grpc.ServerOption{
+		// Validate Google OAuth token
 		grpc.UnaryInterceptor(server.EnsureValidToken),
-		// Enable TLS for all incoming connections.
 		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
 	}
 

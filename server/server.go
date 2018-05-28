@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 
 	"github.com/dln/luxaforce/api"
@@ -55,11 +56,11 @@ func valid(authorization []string) bool {
 		return false
 	}
 	// claimSet.Iss,claimSet.Email ...
-	_, err = googleAuthIDTokenVerifier.Decode(token)
+	claimSet, err := googleAuthIDTokenVerifier.Decode(token)
 	if err != nil {
 		return false
 	}
-
+	log.Printf("User authenicated: %s", claimSet.Email)
 	return true
 }
 
