@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -8,12 +9,21 @@ import (
 	"github.com/dln/luxaforce/api"
 	"github.com/dln/luxaforce/server"
 	"google.golang.org/grpc"
-	// "google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/testdata"
 )
 
 func main() {
 	grpcAddr := "127.0.0.1:5557"
-	var grpcOptions []grpc.ServerOption
+	cert, err := tls.LoadX509KeyPair(testdata.Path("server1.pem"), testdata.Path("server1.key"))
+	if err != nil {
+		log.Fatalf("failed to load key pair: %s", err)
+	}
+	grpcOptions := []grpc.ServerOption{
+		grpc.UnaryInterceptor(server.EnsureValidToken),
+		// Enable TLS for all incoming connections.
+		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+	}
 
 	errc := make(chan error, 1)
 	log.Printf("listening (grpc) on %s", grpcAddr)

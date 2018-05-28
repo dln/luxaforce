@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/futurenda/google-auth-id-token-verifier"
+  packages = ["."]
+  revision = "2a5b89f28b7e414a23e04fdf768f14740a4ec2ed"
+
+[[projects]]
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -26,6 +32,12 @@
     "trace"
   ]
   revision = "dfa909b99c79129e1100513e5cd36307665e5723"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/oauth2"
+  packages = ["jws"]
+  revision = "770e5ebd4ab27c4d70b0983674d138217f5e2c72"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -80,6 +92,7 @@
     "stats",
     "status",
     "tap",
+    "testdata",
     "transport"
   ]
   revision = "41344da2231b913fa3d983840a57a6b1b7b631a1"
@@ -88,6 +101,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2182d4769934491afa150a6e9ee2293dc00d2b8b2576efabd83b9a37cf3ab2fd"
+  inputs-digest = "83998a2dd5f3fe81708898071f7080880cfebb43da0212a17a5130e08c1095e3"
   solver-name = "gps-cdcl"
   solver-version = 1
