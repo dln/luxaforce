@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "cloud.google.com/go"
+  packages = ["compute/metadata"]
+  revision = "0fd7230b2a7505833d5f69b75cbd6c9582401479"
+  version = "v0.23.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/futurenda/google-auth-id-token-verifier"
   packages = ["."]
@@ -20,10 +26,17 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/toqueteos/webbrowser"
+  packages = ["."]
+  revision = "3232c91b8ede8ca86e8962981d881af78875542f"
+  version = "v1.1.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
+    "context/ctxhttp",
     "http/httpguts",
     "http2",
     "http2/hpack",
@@ -36,7 +49,13 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/oauth2"
-  packages = ["jws"]
+  packages = [
+    ".",
+    "google",
+    "internal",
+    "jws",
+    "jwt"
+  ]
   revision = "770e5ebd4ab27c4d70b0983674d138217f5e2c72"
 
 [[projects]]
@@ -61,6 +80,23 @@
   version = "v0.3.0"
 
 [[projects]]
+  name = "google.golang.org/appengine"
+  packages = [
+    ".",
+    "internal",
+    "internal/app_identity",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/modules",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch"
+  ]
+  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
@@ -77,6 +113,7 @@
     "codes",
     "connectivity",
     "credentials",
+    "credentials/oauth",
     "encoding",
     "encoding/proto",
     "grpclb/grpc_lb_v1/messages",
@@ -101,6 +138,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "83998a2dd5f3fe81708898071f7080880cfebb43da0212a17a5130e08c1095e3"
+  inputs-digest = "7e5b3630d3b1573060d188ed62356682ebbbb09c5561c34f6d60b28d40c35e49"
   solver-name = "gps-cdcl"
   solver-version = 1
