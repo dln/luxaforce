@@ -17,7 +17,11 @@ func (d luxaforceAPI) CreateClient(ctx context.Context, req *api.CreateClientReq
 	if req.Client == nil {
 		return nil, errors.New("no client supplied")
 	}
-	return nil, nil
+	resp := &api.CreateClientResp{
+		AlreadyExists: false,
+		Client:        req.Client,
+	}
+	return resp, nil
 }
 func (d luxaforceAPI) DeleteClient(ctx context.Context, req *api.DeleteClientReq) (*api.DeleteClientResp, error) {
 	return nil, nil

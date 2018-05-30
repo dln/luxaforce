@@ -24,11 +24,12 @@ func valid(authorization []string) bool {
 	token := strings.TrimPrefix(authorization[0], "Bearer ")
 	v := googleAuthIDTokenVerifier.Verifier{}
 	//FIXME:
-	aud := "xxxxxx-yyyyyyy.apps.googleusercontent.com"
+	aud := "x-y.apps.googleusercontent.com"
 	err := v.VerifyIDToken(token, []string{
 		aud,
 	})
 	if err != nil {
+		log.Printf("Token verified failed: %v", err)
 		return false
 	}
 	// claimSet.Iss,claimSet.Email ...

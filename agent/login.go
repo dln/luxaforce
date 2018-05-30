@@ -16,6 +16,8 @@ import (
 
 const redirectURIAuthCodeInTitleBar = "urn:ietf:wg:oauth:2.0:oob"
 
+var promptConsent oauth2.AuthCodeOption = oauth2.SetAuthURLParam("prompt", "consent")
+
 // LoginAgent implements the OAuth2 login dance, generating an Oauth2 access_token
 // for the user. If AllowBrowser is set to true, the agent will attempt to
 // obtain an authorization_code automatically by executing OpenBrowser and
@@ -34,6 +36,10 @@ type LoginAgent struct {
 
 	// Open the browser for the given url.  If nil, uses webbrowser.Open.
 	OpenBrowser func(url string) error
+
+	// Google Client id/secret
+	ClientID     string
+	ClientSecret string
 }
 
 // populate missing fields as described in the struct definition comments
@@ -51,12 +57,12 @@ func (a *LoginAgent) init() {
 
 // PerformLogin performs the auth dance necessary to obtain an
 // authorization_code from the user and exchange it for an Oauth2 access_token.
-func (a *LoginAgent) PerformLogin() (*oauth2.Token, error) {
+func (a *LoginAgent) PerformLogin() (oauth2.TokenSource, error) {
 	a.init()
 	conf := &oauth2.Config{
-		ClientID:     "xxxx-yyyyyyy.apps.googleusercontent.com",
-		ClientSecret: "NotSoSecret",
-		Scopes:       []string{"https://www.googleapis.com/auth/cloud-platform"},
+		ClientID:     a.ClientID,
+		ClientSecret: a.ClientSecret,
+		Scopes:       []string{"openid", "profile", "email"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://accounts.google.com/o/oauth2/v2/auth",
 			TokenURL: "https://www.googleapis.com/oauth2/v4/token",
@@ -69,10 +75,14 @@ func (a *LoginAgent) PerformLogin() (*oauth2.Token, error) {
 			defer ln.Close()
 			// open a web browser and listen on the redirect URL port
 			conf.RedirectURL = fmt.Sprintf("http://localhost:%d", port)
-			url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline)
+			url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline, promptConsent)
 			if err := a.OpenBrowser(url); err == nil {
 				if code, err := handleCodeResponse(ln); err == nil {
-					return conf.Exchange(oauth2.NoContext, code)
+					token, err := conf.Exchange(oauth2.NoContext, code)
+					if err != nil {
+						return nil, err
+					}
+					return conf.TokenSource(oauth2.NoContext, token), nil
 				}
 			}
 		}
@@ -85,13 +95,17 @@ func (a *LoginAgent) PerformLogin() (*oauth2.Token, error) {
 		return nil, err
 	}
 
-	return conf.Exchange(oauth2.NoContext, code)
+	token, err := conf.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		return nil, err
+	}
+	return conf.TokenSource(oauth2.NoContext, token), nil
 }
 
 func (a *LoginAgent) codeViaPrompt(conf *oauth2.Config) (string, error) {
 	// Direct the user to our login portal
 	conf.RedirectURL = redirectURIAuthCodeInTitleBar
-	url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline)
+	url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline, promptConsent)
 	fmt.Fprintln(a.Out, "Please visit the following URL and complete the authorization dialog:")
 	fmt.Fprintf(a.Out, "%v\n", url)
 
