@@ -18,9 +18,11 @@ import (
 )
 
 var (
-	app  = kingpin.New("luxaforce", "Control the light.")
-	srv  = app.Command("server", "Start a new server.")
-	agnt = app.Command("agent", "Start a agent.")
+	app                = kingpin.New("luxaforce", "Control the light.")
+	googleClientId     = app.Flag("google-client-id", "Google Client ID.").Required().String()
+	googleClientSecret = app.Flag("google-client-secret", "Google Secret.").Required().String()
+	srv                = app.Command("server", "Start a new server.")
+	agnt               = app.Command("agent", "Start a agent.")
 )
 
 func main() {
@@ -32,7 +34,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to load key pair: %s", err)
 		}
-		validateToken := server.NewValidateToken("x-y.apps.googleusercontent.com")
+		validateToken := server.NewValidateToken(*googleClientId)
 		grpcOptions := []grpc.ServerOption{
 			// Validate Google OAuth token
 			grpc.UnaryInterceptor(validateToken.EnsureValidToken),
@@ -55,9 +57,7 @@ func main() {
 		}()
 		<-errc
 	case agnt.FullCommand():
-		client, err := agent.NewLuxaforceClient(grpcAddr,
-			"x-y.apps.googleusercontent.com",
-			"NotSoSecret")
+		client, err := agent.NewLuxaforceClient(grpcAddr, *googleClientId, *googleClientSecret)
 		if err != nil {
 			log.Fatalf("Client failed: %v", err)
 		}
