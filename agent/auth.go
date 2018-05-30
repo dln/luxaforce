@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"log"
-
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc/credentials"
