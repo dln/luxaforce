@@ -32,9 +32,10 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to load key pair: %s", err)
 		}
+		validateToken := server.NewValidateToken("x-y.apps.googleusercontent.com")
 		grpcOptions := []grpc.ServerOption{
 			// Validate Google OAuth token
-			grpc.UnaryInterceptor(server.EnsureValidToken),
+			grpc.UnaryInterceptor(validateToken.EnsureValidToken),
 			grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
 		}
 
@@ -54,7 +55,9 @@ func main() {
 		}()
 		<-errc
 	case agnt.FullCommand():
-		client, err := agent.NewLuxaforceClient(grpcAddr)
+		client, err := agent.NewLuxaforceClient(grpcAddr,
+			"x-y.apps.googleusercontent.com",
+			"NotSoSecret")
 		if err != nil {
 			log.Fatalf("Client failed: %v", err)
 		}

@@ -9,11 +9,11 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-func NewLuxaforceClient(hostAndPort string) (api.LuxaforceClient, error) {
+func NewLuxaforceClient(hostAndPort, clientId, clientSecret string) (api.LuxaforceClient, error) {
 	login := &LoginAgent{
 		AllowBrowser: true,
-		ClientID:     "x-y.apps.googleusercontent.com",
-		ClientSecret: "notsosecret",
+		ClientID:     clientId,
+		ClientSecret: clientSecret,
 	}
 
 	ts, err := login.PerformLogin()

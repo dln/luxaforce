@@ -17,16 +17,25 @@ var (
 	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
 )
 
-func valid(authorization []string) bool {
+type ValidateToken struct {
+	GoogleClientID string
+}
+
+func NewValidateToken(clientId string) *ValidateToken {
+	return &ValidateToken{
+		GoogleClientID: clientId,
+	}
+}
+
+func (v *ValidateToken) valid(authorization []string) bool {
 	if len(authorization) < 1 {
 		return false
 	}
 	token := strings.TrimPrefix(authorization[0], "Bearer ")
-	v := googleAuthIDTokenVerifier.Verifier{}
-	//FIXME:
-	aud := "x-y.apps.googleusercontent.com"
-	err := v.VerifyIDToken(token, []string{
-		aud,
+	verifier := googleAuthIDTokenVerifier.Verifier{}
+
+	err := verifier.VerifyIDToken(token, []string{
+		v.GoogleClientID,
 	})
 	if err != nil {
 		log.Printf("Token verified failed: %v", err)
@@ -41,14 +50,14 @@ func valid(authorization []string) bool {
 	return true
 }
 
-func EnsureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (v *ValidateToken) EnsureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, errMissingMetadata
 	}
 	// The keys within metadata.MD are normalized to lowercase.
 	// See: https://godoc.org/google.golang.org/grpc/metadata#New
-	if !valid(md["authorization"]) {
+	if !v.valid(md["authorization"]) {
 		return nil, errInvalidToken
 	}
 	// Continue execution of handler after ensuring a valid token.
