@@ -21,7 +21,6 @@ func (ts tokenSource) GetRequestMetadata(ctx context.Context, uri ...string) (ma
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("TOKEN %+v", token)
 	return map[string]string{
 		"authorization": token.Type() + " " + token.Extra("id_token").(string),
 	}, nil
